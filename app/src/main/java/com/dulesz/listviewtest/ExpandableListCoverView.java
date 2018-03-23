@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -57,8 +56,8 @@ public class ExpandableListCoverView extends ListCoverView {
         mCoverContentView = expandView;
     }
 
-    public void init(ListView listView){
-        init(mCoverContentView,listView);
+    public void setViews(View listView){
+        setViews(mCoverContentView,listView);
     }
 
     public void bindView(MyItem item){

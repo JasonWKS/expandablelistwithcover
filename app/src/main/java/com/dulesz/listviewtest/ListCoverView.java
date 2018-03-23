@@ -6,7 +6,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -17,45 +17,64 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 
 /**
  * Created by jason.shen on 2018/3/23.
  */
 
 public class ListCoverView extends FrameLayout {
-    private ListView mListView;
+    private static final String TAG = ListCoverView.class.getSimpleName();
+
+    public static final int ANIM_DUCATION = 300;
+    private View mListView;
     private View mCoverContentView;
     private View mSelectListItemView;
 
     private int mNeedPadding = 0;
     private Animator mAnimator;
 
+    private int mExpandedHeight = 0;
+    private int mCollapsedHeight = 0;
+    private int mShowAlpha = 0;
+    private int mHideAlpha = 0;
+
     public ListCoverView(@NonNull Context context) {
         super(context);
-        init();
+        init(context,null);
     }
 
     public ListCoverView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context,attrs);
     }
 
     public ListCoverView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context,attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ListCoverView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context,attrs);
     }
 
-    private void init(){
+    private void initAttrs(Context context,AttributeSet attrs){
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ListCoverView);
+        mShowAlpha = typedArray.getInteger(R.styleable.ListCoverView_showAlpha,100);
+        mHideAlpha = typedArray.getInteger(R.styleable.ListCoverView_hideAlpha,0);
+        mExpandedHeight = typedArray.getDimensionPixelSize(R.styleable.ListCoverView_expandedHeight,300);
+        mCollapsedHeight = typedArray.getDimensionPixelSize(R.styleable.ListCoverView_collapsedHeight,0);
+        typedArray.recycle();
+    }
+
+    private void init(Context context,AttributeSet attrs){
+        if(attrs != null){
+            initAttrs(context,attrs);
+        }
         setVisibility(View.GONE);
         Drawable drawable = getBackground();
-        drawable.setAlpha(0);
+        drawable.setAlpha(mHideAlpha);
 
         this.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +87,23 @@ public class ListCoverView extends FrameLayout {
         });
     }
 
-    public void init(View expandView,ListView listView){
+    public void setExpandedHeight(int expandedHeight) {
+        mExpandedHeight = expandedHeight;
+    }
+
+    public void setCollapsedHeight(int collapsedHeight) {
+        mCollapsedHeight = collapsedHeight;
+    }
+
+    public void setShowAlpha(int showAlpha) {
+        mShowAlpha = showAlpha;
+    }
+
+    public void setHideAlpha(int hideAlpha) {
+        mHideAlpha = hideAlpha;
+    }
+
+    public void setViews(View expandView, View listView){
         mCoverContentView = expandView;
         mListView = listView;
 
@@ -86,9 +121,8 @@ public class ListCoverView extends FrameLayout {
     public void start(){
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
-        int expandHeight = getResources().getDimensionPixelSize(R.dimen.list_item_expand_height);
-        mNeedPadding = (expandHeight - (height - top));
-        Log.e("TAG222","diff=" + mNeedPadding);
+        mNeedPadding = (mExpandedHeight - (height - top));
+        Log.i(TAG,"diff=" + mNeedPadding);
 
         showCoverView(true);
     }
@@ -98,10 +132,10 @@ public class ListCoverView extends FrameLayout {
             return;
         }
         setVisibility(View.VISIBLE);
-        int startHeight = getResources().getDimensionPixelSize(R.dimen.list_item_height);
-        int endHeight = getResources().getDimensionPixelSize(R.dimen.list_item_expand_height);
-        int startAlpha = 0;
-        int endAlpha = 100;
+        int startHeight = mCollapsedHeight;
+        int endHeight = mExpandedHeight;
+        int startAlpha = mHideAlpha;
+        int endAlpha = mShowAlpha;
         int startPadding = 0;
         if(mNeedPadding <= 0){
             mNeedPadding = 0;
@@ -133,9 +167,9 @@ public class ListCoverView extends FrameLayout {
         endItem.listMargin = endPadding;
         endItem.itemTop = mSelectListItemView.getTop();
 
-        Log.e("TAG222","startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding);
+        Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding);
 
-        Log.e("TAG222","endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding);
+        Log.i(TAG,"endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding);
 
         ObjectAnimator animator = ObjectAnimator.ofObject(new AnimObject(this, mCoverContentView, mSelectListItemView, mListView),
                 "value",
@@ -157,7 +191,7 @@ public class ListCoverView extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                Log.e("TAG333","onAnimationEnd");
+                Log.i(TAG,"onAnimationEnd");
                 if(!show){
                     setVisibility(View.GONE);
                     mSelectListItemView = null;
@@ -167,7 +201,7 @@ public class ListCoverView extends FrameLayout {
             }
         });
 
-        animator.setDuration(300);
+        animator.setDuration(ANIM_DUCATION);
         animator.start();
 
         mAnimator = animator;
@@ -194,7 +228,7 @@ public class ListCoverView extends FrameLayout {
         }
 
         public void setValue(AnimItem value){
-            Log.e("TAG222","value:" + value.coverAlpha + ","
+            Log.i(TAG,"value:" + value.coverAlpha + ","
                     + value.itemHeight + "," + value.itemTop + ","
                     + value.listMargin + "," + value.translationY);
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ListCoverView">
+        <attr name="hideAlpha" format="integer"/>
+        <attr name="showAlpha" format="integer"/>
+        <attr name="collapsedHeight" format="dimension"/>
+        <attr name="expandedHeight" format="dimension"/>
+    </declare-styleable>
+</resources>
