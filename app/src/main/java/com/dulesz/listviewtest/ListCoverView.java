@@ -145,6 +145,10 @@ public class ListCoverView extends FrameLayout {
 
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
+        if(top < 0){
+            mSelectListItemView.setTop(0);
+            top = 0;
+        }
         mNeedPadding = (mExpandedHeight - (height - top));
         Log.i(TAG,"diff=" + mNeedPadding);
 
