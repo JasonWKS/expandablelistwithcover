@@ -1,13 +1,10 @@
 package com.dulesz.listviewtest;
 
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +12,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private ListCoverView mCoverView;
-
-    private TextView mTitleView, mNameView, mContentView;
+    private ExpandableListCoverView mCoverView;
 
 
     @Override
@@ -30,25 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         mListView = findViewById(R.id.lv);
         mCoverView = findViewById(R.id.cover);
-
-        View expandView = getLayoutInflater().inflate(R.layout.list_expand_item,mCoverView,false);
-        mCoverView.init(expandView,mListView);
-        expandView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        mTitleView = expandView.findViewById(R.id.title);
-        mNameView = expandView.findViewById(R.id.name);
-        mContentView = expandView.findViewById(R.id.content);
-
-        mCoverView.setVisibility(View.GONE);
-        Drawable drawable = mCoverView.getBackground();
-        if(drawable instanceof ColorDrawable){
-            drawable.setAlpha(0);
-        }
+        mCoverView.init(mListView);
 
         initAdapter();
 
@@ -61,11 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
                 MyAdapter adapter = (MyAdapter) mListView.getAdapter();
                 MyItem item = (MyItem) adapter.getItem(position);
-
-                mTitleView.setText(item.title);
-                mNameView.setText(item.name);
-                mContentView.setText(item.content);
-
+                mCoverView.bindView(item);
                 mCoverView.setSelectListItemView(view);
 
                 mCoverView.start();

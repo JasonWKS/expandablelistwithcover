@@ -55,9 +55,7 @@ public class ListCoverView extends FrameLayout {
     private void init(){
         setVisibility(View.GONE);
         Drawable drawable = getBackground();
-        if(drawable instanceof ColorDrawable){
-            drawable.setAlpha(0);
-        }
+        drawable.setAlpha(0);
 
         this.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +70,9 @@ public class ListCoverView extends FrameLayout {
 
     public void init(View expandView,ListView listView){
         mCoverContentView = expandView;
-        addView(mCoverContentView);
         mListView = listView;
+
+        addView(expandView);
     }
 
     public void setSelectListItemView(View selectListItemView) {
@@ -195,6 +194,10 @@ public class ListCoverView extends FrameLayout {
         }
 
         public void setValue(AnimItem value){
+            Log.e("TAG222","value:" + value.coverAlpha + ","
+                    + value.itemHeight + "," + value.itemTop + ","
+                    + value.listMargin + "," + value.translationY);
+
             FrameLayout.LayoutParams lvParams = (FrameLayout.LayoutParams) this.listview.getLayoutParams();
             lvParams.topMargin = value.listMargin;
             this.listview.setLayoutParams(lvParams);
@@ -204,9 +207,7 @@ public class ListCoverView extends FrameLayout {
             this.itemContentView.setLayoutParams(params);
 
             Drawable drawable = coverView.getBackground();
-            if(drawable instanceof ColorDrawable){
-                drawable.setAlpha(value.coverAlpha);
-            }
+            drawable.setAlpha(value.coverAlpha);
 
             ViewGroup.LayoutParams params2 =  this.coverContentView.getLayoutParams();
             params2.height = value.itemHeight;

@@ -9,14 +9,11 @@
         android:layout_height="match_parent"
         android:id="@+id/lv"></ListView>
 
-    <com.dulesz.listviewtest.ListCoverView
+    <com.dulesz.listviewtest.ExpandableListCoverView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cover"
         android:background="#000000">
-
-
-
-    </com.dulesz.listviewtest.ListCoverView>
+    </com.dulesz.listviewtest.ExpandableListCoverView>
 </FrameLayout>
 
