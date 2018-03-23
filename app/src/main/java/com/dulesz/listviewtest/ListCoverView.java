@@ -118,7 +118,31 @@ public class ListCoverView extends FrameLayout {
         return mAnimator != null && mAnimator.isRunning();
     }
 
+    private void check(){
+        if(mListView == null){
+            throw new NullPointerException("NULL Listview");
+        }
+
+        if(mCoverContentView == null){
+            throw new NullPointerException("NULL CoverContentView");
+        }
+
+        if(mSelectListItemView == null){
+            throw new NullPointerException("NULL SelectedItemView");
+        }
+
+        if(mShowAlpha <= 0){
+            Log.e(TAG,"showAlpha is 0");
+        }
+
+        if(mExpandedHeight <= 0){
+            Log.e(TAG,"ExpandedHeight is 0");
+        }
+    }
+
     public void start(){
+        check();
+
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
         mNeedPadding = (mExpandedHeight - (height - top));
