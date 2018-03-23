@@ -9,43 +9,14 @@
         android:layout_height="match_parent"
         android:id="@+id/lv"></ListView>
 
-    <FrameLayout
+    <com.dulesz.listviewtest.ListCoverView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cover"
         android:background="#000000">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/list_item_expand_height"
-            android:id="@+id/cover_content"
-            android:orientation="vertical"
-            android:background="#ffffff"
-            >
 
-            <include layout="@layout/list_item"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/list_item_expand_content_height"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/content"
-                    android:text="Content"
-                    android:textSize="13sp"/>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@mipmap/ic_launcher_round"
-                    android:scaleType="fitStart"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </FrameLayout>
+    </com.dulesz.listviewtest.ListCoverView>
 </FrameLayout>
 
