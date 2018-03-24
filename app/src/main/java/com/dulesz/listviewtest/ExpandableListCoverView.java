@@ -43,17 +43,17 @@ public class ExpandableListCoverView extends ListCoverView {
 
     private void init(){
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View expandView = inflater.inflate(R.layout.list_expand_item,this,false);
-        mTitleView = expandView.findViewById(R.id.title);
-        mNameView = expandView.findViewById(R.id.name);
-        mContentView = expandView.findViewById(R.id.content);
-        expandView.setOnClickListener(new View.OnClickListener() {
+        inflater.inflate(R.layout.list_expand_item,this,true);
+        mCoverContentView = findViewById(R.id.cover_content);
+        mTitleView = mCoverContentView.findViewById(R.id.title);
+        mNameView = mCoverContentView.findViewById(R.id.name);
+        mContentView = mCoverContentView.findViewById(R.id.content);
+        mCoverContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
-        mCoverContentView = expandView;
     }
 
     public void setViews(View listView){

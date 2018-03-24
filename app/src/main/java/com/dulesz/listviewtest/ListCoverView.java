@@ -107,7 +107,9 @@ public class ListCoverView extends FrameLayout {
         mCoverContentView = expandView;
         mListView = listView;
 
-        addView(expandView);
+        if(expandView.getParent() == null){
+            addView(expandView);
+        }
     }
 
     public void setSelectListItemView(View selectListItemView) {
