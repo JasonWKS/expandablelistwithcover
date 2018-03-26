@@ -17,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 /**
  * Created by jason.shen on 2018/3/23.
@@ -37,6 +40,8 @@ public class ListCoverView extends FrameLayout {
     private int mCollapsedHeight = 0;
     private int mShowAlpha = 0;
     private int mHideAlpha = 0;
+
+    private int mExtraTop = 0;
 
     public ListCoverView(@NonNull Context context) {
         super(context);
@@ -145,6 +150,8 @@ public class ListCoverView extends FrameLayout {
     public void start(){
         check();
 
+        caculateTop();
+
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
         if(top < 0){
@@ -211,7 +218,7 @@ public class ListCoverView extends FrameLayout {
                         item.coverAlpha = (int) (startValue.coverAlpha + fraction * (endValue.coverAlpha - startValue.coverAlpha));
                         item.listMargin = (int) (startValue.listMargin + fraction * (endValue.listMargin - startValue.listMargin));
                         item.itemTop = startValue.itemTop;
-                        item.translationY = item.itemTop + Math.min(0,item.listMargin);
+                        item.translationY = item.itemTop + Math.min(0,item.listMargin) + mExtraTop;
                         return item;
                     }
                 },startItem,endItem);
@@ -237,6 +244,16 @@ public class ListCoverView extends FrameLayout {
         mAnimator = animator;
     }
 
+    private void caculateTop(){
+        int[] listLoc = new int[2];
+        mListView.getLocationInWindow(listLoc);
+
+        int[] coverLoc = new int[2];
+        getLocationInWindow(coverLoc);
+
+        mExtraTop = listLoc[1] - coverLoc[1];
+    }
+
     private class AnimItem{
         public int itemTop;
         public int coverAlpha;
@@ -248,13 +265,13 @@ public class ListCoverView extends FrameLayout {
     private class AnimObject{
         private View coverView;
         private View coverContentView,itemContentView;
-        private View listview;
+        private ListView listview;
 
         public AnimObject(View coverView,  View coverContentView, View itemContentView, View listview) {
             this.coverView = coverView;
             this.coverContentView = coverContentView;
             this.itemContentView = itemContentView;
-            this.listview = listview;
+            this.listview = (ListView) listview;
         }
 
         public void setValue(AnimItem value){
@@ -262,7 +279,7 @@ public class ListCoverView extends FrameLayout {
                     + value.itemHeight + "," + value.itemTop + ","
                     + value.listMargin + "," + value.translationY);
 
-            FrameLayout.LayoutParams lvParams = (FrameLayout.LayoutParams) this.listview.getLayoutParams();
+            ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) this.listview.getLayoutParams();
             lvParams.topMargin = value.listMargin;
             this.listview.setLayoutParams(lvParams);
 

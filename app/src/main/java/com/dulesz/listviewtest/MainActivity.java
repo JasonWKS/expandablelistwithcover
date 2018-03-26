@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
     private ExpandableListCoverView mCoverView;
-
+    private View mListContentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         mListView = findViewById(R.id.lv);
         mCoverView = findViewById(R.id.cover);
+        mListContentView = findViewById(R.id.listContentView);
         mCoverView.setViews(mListView);
 
         initAdapter();
