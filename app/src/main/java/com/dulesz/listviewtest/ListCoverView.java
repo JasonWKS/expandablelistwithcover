@@ -197,12 +197,14 @@ public class ListCoverView extends FrameLayout {
         startItem.coverAlpha = startAlpha;
         startItem.listMargin = startPadding;
         startItem.itemTop = mSelectListItemView.getTop();
+        startItem.extraTop = mExtraTop;
 
         AnimItem endItem = new AnimItem();
         endItem.itemHeight = endHeight;
         endItem.coverAlpha = endAlpha;
         endItem.listMargin = endPadding;
         endItem.itemTop = mSelectListItemView.getTop();
+        endItem.extraTop = mExtraTop;
 
         Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding);
 
@@ -218,7 +220,8 @@ public class ListCoverView extends FrameLayout {
                         item.coverAlpha = (int) (startValue.coverAlpha + fraction * (endValue.coverAlpha - startValue.coverAlpha));
                         item.listMargin = (int) (startValue.listMargin + fraction * (endValue.listMargin - startValue.listMargin));
                         item.itemTop = startValue.itemTop;
-                        item.translationY = item.itemTop + Math.min(0,item.listMargin) + mExtraTop;
+                        item.extraTop = startValue.extraTop;
+                        item.translationY = item.itemTop + Math.min(0,item.listMargin) + item.extraTop;
                         return item;
                     }
                 },startItem,endItem);
@@ -256,6 +259,7 @@ public class ListCoverView extends FrameLayout {
 
     private class AnimItem{
         public int itemTop;
+        public int extraTop;
         public int coverAlpha;
         public int itemHeight;
         public int listMargin;
