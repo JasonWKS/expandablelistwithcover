@@ -17,9 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 /**
  * Created by jason.shen on 2018/3/23.
@@ -31,6 +29,7 @@ public class ListCoverView extends FrameLayout {
     public static final int ANIM_DUCATION = 300;
     private View mListView;
     private View mCoverContentView;
+    private View mContentContainerView;
     private View mSelectListItemView;
 
     private int mNeedPadding = 0;
@@ -108,13 +107,21 @@ public class ListCoverView extends FrameLayout {
         mHideAlpha = hideAlpha;
     }
 
-    public void setViews(View expandView, View listView){
+    public void setViews(View expandView, View listView, View contentContainerView){
         mCoverContentView = expandView;
         mListView = listView;
+        mContentContainerView = contentContainerView;
 
         if(expandView.getParent() == null){
             addView(expandView);
         }
+
+        mListView.post(new Runnable() {
+            @Override
+            public void run() {
+                caculateTop();
+            }
+        });
     }
 
     public void setSelectListItemView(View selectListItemView) {
@@ -149,8 +156,6 @@ public class ListCoverView extends FrameLayout {
 
     public void start(){
         check();
-
-        caculateTop();
 
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
@@ -192,7 +197,7 @@ public class ListCoverView extends FrameLayout {
             endPadding = temp;
         }
 
-        AnimItem startItem = new AnimItem();
+        final AnimItem startItem = new AnimItem();
         startItem.itemHeight = startHeight;
         startItem.coverAlpha = startAlpha;
         startItem.listMargin = startPadding;
@@ -252,7 +257,7 @@ public class ListCoverView extends FrameLayout {
         mListView.getLocationInWindow(listLoc);
 
         int[] coverLoc = new int[2];
-        getLocationInWindow(coverLoc);
+        mContentContainerView.getLocationInWindow(coverLoc);
 
         mExtraTop = listLoc[1] - coverLoc[1];
     }

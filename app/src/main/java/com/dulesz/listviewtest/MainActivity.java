@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         mListView = findViewById(R.id.lv);
         mCoverView = findViewById(R.id.cover);
         mListContentView = findViewById(R.id.listContentView);
-        mCoverView.setViews(mListView);
+        mCoverView.setViews(mListView,mListContentView);
 
         initAdapter();
 

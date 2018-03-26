@@ -56,8 +56,8 @@ public class ExpandableListCoverView extends ListCoverView {
         });
     }
 
-    public void setViews(View listView){
-        setViews(mCoverContentView,listView);
+    public void setViews(View listView, View contentContainerView){
+        setViews(mCoverContentView,listView,contentContainerView);
     }
 
     public void bindView(MyItem item){
