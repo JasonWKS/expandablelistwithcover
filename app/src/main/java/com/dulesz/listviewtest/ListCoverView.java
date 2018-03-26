@@ -19,6 +19,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.dulesz.listviewtest.R;
+
+
 /**
  * Created by jason.shen on 2018/3/23.
  */
@@ -28,12 +31,13 @@ public class ListCoverView extends FrameLayout {
 
     public static final int ANIM_DUCATION = 300;
     private View mListView;
-    private View mCoverContentView;
     private View mContentContainerView;
+    private View mCoverContentView;
     private View mSelectListItemView;
 
     private int mNeedPadding = 0;
-    private Animator mAnimator;
+    private ObjectAnimator mAnimator;
+    private AnimObject mAnimTarget;
 
     private int mExpandedHeight = 0;
     private int mCollapsedHeight = 0;
@@ -116,7 +120,7 @@ public class ListCoverView extends FrameLayout {
             addView(expandView);
         }
 
-        mListView.post(new Runnable() {
+        mContentContainerView.post(new Runnable() {
             @Override
             public void run() {
                 caculateTop();
@@ -197,41 +201,52 @@ public class ListCoverView extends FrameLayout {
             endPadding = temp;
         }
 
-        final AnimItem startItem = new AnimItem();
+        AnimItem startItem = new AnimItem();
         startItem.itemHeight = startHeight;
         startItem.coverAlpha = startAlpha;
         startItem.listMargin = startPadding;
         startItem.itemTop = mSelectListItemView.getTop();
         startItem.extraTop = mExtraTop;
 
-        AnimItem endItem = new AnimItem();
+        final AnimItem endItem = new AnimItem();
         endItem.itemHeight = endHeight;
         endItem.coverAlpha = endAlpha;
         endItem.listMargin = endPadding;
         endItem.itemTop = mSelectListItemView.getTop();
         endItem.extraTop = mExtraTop;
 
-        Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding);
+        Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding + ", itemTop:" + startItem.itemTop + ", extraTop:" + startItem.extraTop);
 
-        Log.i(TAG,"endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding);
+        Log.i(TAG,"endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding + ", itemTop:" + endItem.itemTop + ", extraTop:" + endItem.extraTop);
 
-        ObjectAnimator animator = ObjectAnimator.ofObject(new AnimObject(this, mCoverContentView, mSelectListItemView, mListView),
-                "value",
-                new TypeEvaluator<AnimItem>() {
-                    @Override
-                    public AnimItem evaluate(float fraction, AnimItem startValue, AnimItem endValue) {
-                        AnimItem item = new AnimItem();
-                        item.itemHeight = (int) (startValue.itemHeight + fraction * (endValue.itemHeight - startValue.itemHeight));
-                        item.coverAlpha = (int) (startValue.coverAlpha + fraction * (endValue.coverAlpha - startValue.coverAlpha));
-                        item.listMargin = (int) (startValue.listMargin + fraction * (endValue.listMargin - startValue.listMargin));
-                        item.itemTop = startValue.itemTop;
-                        item.extraTop = startValue.extraTop;
-                        item.translationY = item.itemTop + Math.min(0,item.listMargin) + item.extraTop;
-                        return item;
-                    }
-                },startItem,endItem);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addListener(new AnimatorListenerAdapter() {
+        if(mAnimator == null){
+            mAnimTarget = new AnimObject(this, mCoverContentView, mSelectListItemView, mListView);
+            ObjectAnimator animator = ObjectAnimator.ofObject(mAnimTarget,
+                    "value",
+                    new TypeEvaluator<AnimItem>() {
+                        @Override
+                        public AnimItem evaluate(float fraction, AnimItem startValue, AnimItem endValue) {
+                            AnimItem item = new AnimItem();
+                            item.itemHeight = (int) (startValue.itemHeight + fraction * (endValue.itemHeight - startValue.itemHeight));
+                            item.coverAlpha = (int) (startValue.coverAlpha + fraction * (endValue.coverAlpha - startValue.coverAlpha));
+                            item.listMargin = (int) (startValue.listMargin + fraction * (endValue.listMargin - startValue.listMargin));
+                            item.itemTop = startValue.itemTop;
+                            item.extraTop = startValue.extraTop;
+                            item.translationY = item.itemTop + Math.min(0,item.listMargin) + item.extraTop;
+                            return item;
+                        }
+                    },startItem,endItem);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            animator.setDuration(ANIM_DUCATION);
+            mAnimator = animator;
+        }else{
+            mAnimTarget.itemContentView = mSelectListItemView;
+            mAnimator.setObjectValues(startItem,endItem);
+        }
+
+        mAnimator.removeAllListeners();
+        mAnimator.addListener(new AnimatorListenerAdapter() {
 
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -242,14 +257,10 @@ public class ListCoverView extends FrameLayout {
                     mSelectListItemView = null;
                     mNeedPadding = 0;
                 }
-                mAnimator = null;
+                animation.removeAllListeners();
             }
         });
-
-        animator.setDuration(ANIM_DUCATION);
-        animator.start();
-
-        mAnimator = animator;
+        mAnimator.start();
     }
 
     private void caculateTop(){
@@ -304,6 +315,12 @@ public class ListCoverView extends FrameLayout {
             this.coverContentView.setTranslationY(value.translationY);
             this.coverContentView.setLayoutParams(params2);
 
+        }
+    }
+
+    public void end(){
+        if(mAnimator != null && mAnimator.isRunning()){
+            mAnimator.end();
         }
     }
 }
