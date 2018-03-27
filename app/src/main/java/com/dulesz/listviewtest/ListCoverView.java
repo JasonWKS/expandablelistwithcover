@@ -350,14 +350,13 @@ public class ListCoverView extends FrameLayout {
     public void dismissSmooth(){
         boolean show = mShow;
         if(show){
-            cancel();
+            end();
             showCoverView(false);
         }
     }
 
     public void dismiss(){
-        cancel();
-
+        end();
         ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
         lvParams.topMargin = 0;
         mListView.setLayoutParams(lvParams);
