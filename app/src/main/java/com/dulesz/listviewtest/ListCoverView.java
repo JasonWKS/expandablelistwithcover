@@ -357,23 +357,27 @@ public class ListCoverView extends FrameLayout {
 
     public void dismiss(){
         end();
-        ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
-        lvParams.topMargin = 0;
-        mListView.setLayoutParams(lvParams);
 
-        ViewGroup.LayoutParams params = mSelectListItemView.getLayoutParams();
-        params.height = mCollapsedHeight;
-        mSelectListItemView.setLayoutParams(params);
+        if(mShow){
+            ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
+            lvParams.topMargin = 0;
+            mListView.setLayoutParams(lvParams);
 
-        if(mExpandListener != null){
-            mExpandListener.onCollapsed();
+            ViewGroup.LayoutParams params = mSelectListItemView.getLayoutParams();
+            params.height = mCollapsedHeight;
+            mSelectListItemView.setLayoutParams(params);
+
+            if(mExpandListener != null){
+                mExpandListener.onCollapsed();
+            }
+
+            reset();
         }
-
-        reset();
     }
 
     private void reset(){
         setVisibility(View.GONE);
         mShow = false;
+        mSelectListItemView = null;
     }
 }
