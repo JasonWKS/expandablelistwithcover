@@ -19,8 +19,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
-import com.dulesz.listviewtest.R;
-
 
 /**
  * Created by jason.shen on 2018/3/23.
@@ -29,7 +27,7 @@ import com.dulesz.listviewtest.R;
 public class ListCoverView extends FrameLayout {
     private static final String TAG = ListCoverView.class.getSimpleName();
 
-    public static final int ANIM_DUCATION = 300;
+    public static final int ANIM_DUCATION = 1000;
     private View mListView;
     private View mContentContainerView;
     private View mCoverContentView;
@@ -38,6 +36,7 @@ public class ListCoverView extends FrameLayout {
     private int mNeedPadding = 0;
     private ObjectAnimator mAnimator;
     private AnimObject mAnimTarget;
+    private boolean mShow = false;
 
     private int mExpandedHeight = 0;
     private int mCollapsedHeight = 0;
@@ -45,6 +44,13 @@ public class ListCoverView extends FrameLayout {
     private int mHideAlpha = 0;
 
     private int mExtraTop = 0;
+
+    private ExpandListener mExpandListener;
+
+    public interface ExpandListener{
+        public void onExpanded();
+        public void onCollapsed();
+    }
 
     public ListCoverView(@NonNull Context context) {
         super(context);
@@ -111,6 +117,10 @@ public class ListCoverView extends FrameLayout {
         mHideAlpha = hideAlpha;
     }
 
+    public void setExpandListener(ExpandListener expandListener) {
+        mExpandListener = expandListener;
+    }
+
     public void setViews(View expandView, View listView, View contentContainerView){
         mCoverContentView = expandView;
         mListView = listView;
@@ -139,6 +149,10 @@ public class ListCoverView extends FrameLayout {
     private void check(){
         if(mListView == null){
             throw new NullPointerException("NULL Listview");
+        }
+
+        if(mContentContainerView == null){
+            throw new NullPointerException("NULL ContentContainerView");
         }
 
         if(mCoverContentView == null){
@@ -173,10 +187,11 @@ public class ListCoverView extends FrameLayout {
         showCoverView(true);
     }
 
-    private void showCoverView(final boolean show){
+    private void showCoverView(boolean show){
         if(mSelectListItemView == null){
             return;
         }
+        mShow = show;
         setVisibility(View.VISIBLE);
         int startHeight = mCollapsedHeight;
         int endHeight = mExpandedHeight;
@@ -237,29 +252,31 @@ public class ListCoverView extends FrameLayout {
                         }
                     },startItem,endItem);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
-
             animator.setDuration(ANIM_DUCATION);
+            animator.addListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    Log.i(TAG,"onAnimationEnd");
+                    if(!mShow){
+                        reset();
+                    }
+
+                    if(mExpandListener != null){
+                        if(mShow){
+                            mExpandListener.onExpanded();
+                        }else{
+                            mExpandListener.onCollapsed();
+                        }
+                    }
+                }
+            });
             mAnimator = animator;
         }else{
             mAnimTarget.itemContentView = mSelectListItemView;
             mAnimator.setObjectValues(startItem,endItem);
         }
-
-        mAnimator.removeAllListeners();
-        mAnimator.addListener(new AnimatorListenerAdapter() {
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                Log.i(TAG,"onAnimationEnd");
-                if(!show){
-                    setVisibility(View.GONE);
-                    mSelectListItemView = null;
-                    mNeedPadding = 0;
-                }
-                animation.removeAllListeners();
-            }
-        });
         mAnimator.start();
     }
 
@@ -295,9 +312,9 @@ public class ListCoverView extends FrameLayout {
         }
 
         public void setValue(AnimItem value){
-            Log.i(TAG,"value:" + value.coverAlpha + ","
-                    + value.itemHeight + "," + value.itemTop + ","
-                    + value.listMargin + "," + value.translationY);
+//            Log.i(TAG,"value:" + value.coverAlpha + ","
+//                    + value.itemHeight + "," + value.itemTop + ","
+//                    + value.listMargin + "," + value.translationY);
 
             ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) this.listview.getLayoutParams();
             lvParams.topMargin = value.listMargin;
@@ -322,5 +339,42 @@ public class ListCoverView extends FrameLayout {
         if(mAnimator != null && mAnimator.isRunning()){
             mAnimator.end();
         }
+    }
+
+    public void cancel(){
+        if(mAnimator != null && mAnimator.isRunning()){
+            mAnimator.cancel();
+        }
+    }
+
+    public void dismissSmooth(){
+        boolean show = mShow;
+        if(show){
+            cancel();
+            showCoverView(false);
+        }
+    }
+
+    public void dismiss(){
+        cancel();
+
+        ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
+        lvParams.topMargin = 0;
+        mListView.setLayoutParams(lvParams);
+
+        ViewGroup.LayoutParams params = mSelectListItemView.getLayoutParams();
+        params.height = mCollapsedHeight;
+        mSelectListItemView.setLayoutParams(params);
+
+        if(mExpandListener != null){
+            mExpandListener.onCollapsed();
+        }
+
+        reset();
+    }
+
+    private void reset(){
+        setVisibility(View.GONE);
+        mShow = false;
     }
 }

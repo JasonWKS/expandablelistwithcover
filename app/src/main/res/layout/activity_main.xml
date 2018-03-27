@@ -35,5 +35,17 @@
         cover:collapsedHeight="@dimen/list_item_height"
         cover:expandedHeight="@dimen/list_item_expand_height">
     </com.dulesz.listviewtest.ExpandableListCoverView>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnDismiss"
+        android:text="Dismiss"/>
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnDismissSmooth"
+        android:text="Dismiss Smooth"
+        android:layout_marginLeft="150dp"/>
 </FrameLayout>
 

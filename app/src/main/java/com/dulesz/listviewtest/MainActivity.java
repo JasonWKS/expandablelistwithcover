@@ -2,8 +2,10 @@ package com.dulesz.listviewtest;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListView;
     private ExpandableListCoverView mCoverView;
     private View mListContentView;
+
+    private Button mBtnDismiss;
+    private Button mBtnDismissSmooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,33 @@ public class MainActivity extends AppCompatActivity {
 //                mListView.setLayoutParams(params1);
             }
         });
+
+        mBtnDismiss = findViewById(R.id.btnDismiss);
+        mBtnDismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCoverView.dismiss();
+            }
+        });
+        mBtnDismissSmooth = findViewById(R.id.btnDismissSmooth);
+        mBtnDismissSmooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCoverView.dismissSmooth();
+            }
+        });
+
+        mCoverView.setExpandListener(new ListCoverView.ExpandListener() {
+            @Override
+            public void onExpanded() {
+                Log.e("TAG111","onExpanded");
+            }
+
+            @Override
+            public void onCollapsed() {
+                Log.e("TAG111","onCollapsed");
+            }
+        });
     }
 
     private void initAdapter() {
@@ -67,4 +99,5 @@ public class MainActivity extends AppCompatActivity {
         MyAdapter adapter = new MyAdapter(this, dataList);
         mListView.setAdapter(adapter);
     }
+
 }
