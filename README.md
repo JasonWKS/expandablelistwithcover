@@ -2,6 +2,9 @@
 1. 可展开的列表
 2. 展开后像遮罩层上展示
 
+## 效果
+![演示](https://github.com/JasonWKS/expandablelistwithcover/blob/master/images/20180324_223457.gif)
+
 
 1. 初始状态
 ![初始状态](https://github.com/JasonWKS/expandablelistwithcover/blob/master/images/Screenshot_2018-03-23-17-04-35-128_com.dulesz.lis.png)
