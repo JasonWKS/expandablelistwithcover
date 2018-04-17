@@ -76,13 +76,23 @@ public class MainActivity extends AppCompatActivity {
 
         mCoverView.setExpandListener(new ListCoverView.ExpandListener() {
             @Override
-            public void onExpanded() {
-                Log.e("TAG111","onExpanded");
+            public void onExpandStart() {
+                Log.i("TAG111","onExpandStart");
             }
 
             @Override
-            public void onCollapsed() {
-                Log.e("TAG111","onCollapsed");
+            public void onExpandend() {
+                Log.i("TAG111","onExpandend");
+            }
+
+            @Override
+            public void onCollapseStart() {
+                Log.i("TAG111","onCollapseStart");
+            }
+
+            @Override
+            public void onCollapseEnd() {
+                Log.i("TAG111","onCollapseEnd");
             }
         });
     }

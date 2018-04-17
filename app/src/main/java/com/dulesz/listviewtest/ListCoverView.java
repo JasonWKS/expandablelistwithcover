@@ -51,8 +51,11 @@ public class ListCoverView extends FrameLayout {
     private ExpandListener mExpandListener;
 
     public interface ExpandListener{
-        public void onExpanded();
-        public void onCollapsed();
+        public void onExpandStart();
+        public void onExpandend();
+
+        public void onCollapseStart();
+        public void onCollapseEnd();
     }
 
     public ListCoverView(@NonNull Context context) {
@@ -268,20 +271,16 @@ public class ListCoverView extends FrameLayout {
             animator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    onAnimationStarted();
+                }
+
+                @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     Log.i(TAG,"onAnimationEnd");
-                    if(!mShow){
-                        reset();
-                    }
-
-                    if(mExpandListener != null){
-                        if(mShow){
-                            mExpandListener.onExpanded();
-                        }else{
-                            mExpandListener.onCollapsed();
-                        }
-                    }
+                    onAnimationEnded();
                 }
             });
             mAnimator = animator;
@@ -347,6 +346,30 @@ public class ListCoverView extends FrameLayout {
         }
     }
 
+    protected void onAnimationStarted(){
+        if (mExpandListener != null) {
+            if (mShow) {
+                mExpandListener.onExpandStart();
+            } else {
+                mExpandListener.onCollapseStart();
+            }
+        }
+    }
+
+    protected void onAnimationEnded(){
+        if (!mShow) {
+            reset();
+        }
+
+        if (mExpandListener != null) {
+            if (mShow) {
+                mExpandListener.onExpandend();
+            } else {
+                mExpandListener.onCollapseEnd();
+            }
+        }
+    }
+
     public void end(){
         if(mAnimator != null && mAnimator.isRunning()){
             mAnimator.end();
@@ -373,7 +396,7 @@ public class ListCoverView extends FrameLayout {
         if(mShow){
             reset();
             if(mExpandListener != null){
-                mExpandListener.onCollapsed();
+                mExpandListener.onCollapseEnd();
             }
         }
     }
