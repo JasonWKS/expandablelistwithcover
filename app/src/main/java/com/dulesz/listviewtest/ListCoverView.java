@@ -28,10 +28,10 @@ public class ListCoverView extends FrameLayout {
     private static final String TAG = ListCoverView.class.getSimpleName();
 
     public static final int ANIM_DUCATION = 1000;
-    private View mListView;
-    private View mContentContainerView;
-    private View mCoverContentView;
-    private View mSelectListItemView;
+    protected View mListView;
+    protected View mContentContainerView;
+    protected View mCoverContentView;
+    protected View mSelectListItemView;
 
     //the listview should move up when the coverContentView can not display all height.
     //the needpadding param is the listview will move up distance in px
