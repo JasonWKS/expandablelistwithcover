@@ -33,16 +33,19 @@ public class ListCoverView extends FrameLayout {
     private View mCoverContentView;
     private View mSelectListItemView;
 
+    //the listview should move up when the coverContentView can not display all height.
+    //the needpadding param is the listview will move up distance in px
     private int mNeedPadding = 0;
     private ObjectAnimator mAnimator;
     private AnimObject mAnimTarget;
     private boolean mShow = false;
 
-    private int mExpandedHeight = 0;
-    private int mCollapsedHeight = 0;
-    private int mShowAlpha = 0;
-    private int mHideAlpha = 0;
+    private int mExpandedHeight = 0;//the content view height when is expanded
+    private int mCollapsedHeight = 0; // the content view height when is collapsed
+    private int mShowAlpha = 0; // the cover background alpha when cover is show
+    private int mHideAlpha = 0;  // the cover backround alpha when cover is hide
 
+    private int mOriginalListViewMarginTop = 0;
     private int mExtraTop = 0;
 
     private ExpandListener mExpandListener;
@@ -133,6 +136,7 @@ public class ListCoverView extends FrameLayout {
         mContentContainerView.post(new Runnable() {
             @Override
             public void run() {
+                mOriginalListViewMarginTop = ((MarginLayoutParams)mListView.getLayoutParams()).topMargin;
                 caculateTop();
             }
         });
@@ -173,7 +177,12 @@ public class ListCoverView extends FrameLayout {
     }
 
     public void start(){
-        check();
+        try {
+            check();
+        }catch (Exception ex){
+            Log.e(TAG,"check",ex);
+            return;
+        }
 
         int height = mListView.getHeight();
         int top = mSelectListItemView.getTop();
@@ -197,11 +206,11 @@ public class ListCoverView extends FrameLayout {
         int endHeight = mExpandedHeight;
         int startAlpha = mHideAlpha;
         int endAlpha = mShowAlpha;
-        int startPadding = 0;
+        int startPadding = mOriginalListViewMarginTop;
         if(mNeedPadding <= 0){
             mNeedPadding = 0;
         }
-        int endPadding = -1 * mNeedPadding;
+        int endPadding = -1 * mNeedPadding + mOriginalListViewMarginTop;
         if(!show){
             int temp = startHeight;
             startHeight = endHeight;
@@ -216,23 +225,23 @@ public class ListCoverView extends FrameLayout {
             endPadding = temp;
         }
 
-        AnimItem startItem = new AnimItem();
+        final AnimItem startItem = new AnimItem();
         startItem.itemHeight = startHeight;
         startItem.coverAlpha = startAlpha;
         startItem.listMargin = startPadding;
-        startItem.itemTop = mSelectListItemView.getTop();
-        startItem.extraTop = mExtraTop;
+        startItem.originalListViewMargin = mOriginalListViewMarginTop;
+        startItem.extraTranslationY = mSelectListItemView.getTop() + mExtraTop;
 
         final AnimItem endItem = new AnimItem();
         endItem.itemHeight = endHeight;
         endItem.coverAlpha = endAlpha;
         endItem.listMargin = endPadding;
-        endItem.itemTop = mSelectListItemView.getTop();
-        endItem.extraTop = mExtraTop;
+        endItem.originalListViewMargin = mOriginalListViewMarginTop;
+        endItem.extraTranslationY = mSelectListItemView.getTop() + mExtraTop;
 
-        Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding + ", itemTop:" + startItem.itemTop + ", extraTop:" + startItem.extraTop);
+        Log.i(TAG,"startHeight:" + startHeight + ", startAlpha:" + startAlpha + ", startPadding:" + startPadding + ", extraTranslationY:" + startItem.extraTranslationY);
 
-        Log.i(TAG,"endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding + ", itemTop:" + endItem.itemTop + ", extraTop:" + endItem.extraTop);
+        Log.i(TAG,"endHeight:" + endHeight + ", endAlpha:" + endAlpha + ", endPadding:" + endPadding + ", extraTranslationY:" + endItem.extraTranslationY);
 
         if(mAnimator == null){
             mAnimTarget = new AnimObject(this, mCoverContentView, mSelectListItemView, mListView);
@@ -245,9 +254,12 @@ public class ListCoverView extends FrameLayout {
                             item.itemHeight = (int) (startValue.itemHeight + fraction * (endValue.itemHeight - startValue.itemHeight));
                             item.coverAlpha = (int) (startValue.coverAlpha + fraction * (endValue.coverAlpha - startValue.coverAlpha));
                             item.listMargin = (int) (startValue.listMargin + fraction * (endValue.listMargin - startValue.listMargin));
-                            item.itemTop = startValue.itemTop;
-                            item.extraTop = startValue.extraTop;
-                            item.translationY = item.itemTop + Math.min(0,item.listMargin) + item.extraTop;
+                            int distance = item.listMargin - startItem.originalListViewMargin;
+                            item.translationY = Math.min(0, distance) + startValue.extraTranslationY;
+                            Log.i(TAG,"item.extraTranslationY:" + item.extraTranslationY +
+                                    ",  Math.min(0, distance):" + Math.min(0,distance)
+                                    + ", transY:" + item.translationY
+                            );
                             return item;
                         }
                     },startItem,endItem);
@@ -291,11 +303,11 @@ public class ListCoverView extends FrameLayout {
     }
 
     private class AnimItem{
-        public int itemTop;
-        public int extraTop;
         public int coverAlpha;
         public int itemHeight;
         public int listMargin;
+        public int originalListViewMargin;
+        public int extraTranslationY;
         public int translationY;
     }
 
@@ -359,23 +371,22 @@ public class ListCoverView extends FrameLayout {
         end();
 
         if(mShow){
-            ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
-            lvParams.topMargin = 0;
-            mListView.setLayoutParams(lvParams);
-
-            ViewGroup.LayoutParams params = mSelectListItemView.getLayoutParams();
-            params.height = mCollapsedHeight;
-            mSelectListItemView.setLayoutParams(params);
-
+            reset();
             if(mExpandListener != null){
                 mExpandListener.onCollapsed();
             }
-
-            reset();
         }
     }
 
     private void reset(){
+        ViewGroup.MarginLayoutParams lvParams = (ViewGroup.MarginLayoutParams) mListView.getLayoutParams();
+        lvParams.topMargin = mOriginalListViewMarginTop;
+        mListView.setLayoutParams(lvParams);
+
+        ViewGroup.LayoutParams params = mSelectListItemView.getLayoutParams();
+        params.height = mCollapsedHeight;
+        mSelectListItemView.setLayoutParams(params);
+
         setVisibility(View.GONE);
         mShow = false;
         mSelectListItemView = null;

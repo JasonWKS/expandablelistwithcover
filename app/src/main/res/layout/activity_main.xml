@@ -14,7 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/lv"
-            android:layout_below="@+id/title"></ListView>
+            android:layout_below="@+id/title"
+            android:layout_marginTop="20dp"></ListView>
 
         <TextView
             android:layout_width="match_parent"
@@ -40,12 +41,14 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:id="@+id/btnDismiss"
-        android:text="Dismiss"/>
+        android:text="Dismiss"
+        android:visibility="visible"/>
     <Button
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:id="@+id/btnDismissSmooth"
         android:text="Dismiss Smooth"
-        android:layout_marginLeft="150dp"/>
+        android:layout_marginLeft="150dp"
+        android:visibility="visible"/>
 </FrameLayout>
 
